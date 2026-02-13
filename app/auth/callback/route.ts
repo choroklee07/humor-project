@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
+import { type NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
 
@@ -10,14 +10,35 @@ export async function GET(request: Request) {
       ? "http://localhost:3000"
       : "https://humor-project-swart.vercel.app";
 
+  const redirectUrl = `${baseUrl}/assignment-2`;
+
   if (code) {
-    const supabase = await createClient();
+    const response = NextResponse.redirect(redirectUrl);
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              request.cookies.set(name, value);
+              response.cookies.set(name, value, options);
+            });
+          },
+        },
+      }
+    );
+
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      return NextResponse.redirect(`${baseUrl}/assignment-2`);
+      return response;
     }
   }
 
-  return NextResponse.redirect(`${baseUrl}/assignment-2?error=auth-code-error`);
+  return NextResponse.redirect(`${redirectUrl}?error=auth-code-error`);
 }
