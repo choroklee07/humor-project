@@ -1,14 +1,40 @@
 import Image from "next/image";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
+import Navbar from "@/components/Navbar";
+import AuthButton from "./components/AuthButton";
 
-export const revalidate = 60;
+export default async function Assignment2({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
+  const supabase = await createClient();
 
-export default async function Assignment2() {
-  const { data: captions, error } = await supabase
-    .from("captions")
-    .select("id, content, like_count, images(id, url)")
-    .order("like_count", { ascending: false })
-    .limit(10);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  type Caption = {
+    id: string;
+    content: string;
+    like_count: number;
+    images: { id: string; url: string } | null;
+  };
+
+  let captions: Caption[] | null = null;
+  let fetchError = false;
+
+  if (user) {
+    const result = await supabase
+      .from("captions")
+      .select("id, content, like_count, images(id, url)")
+      .order("like_count", { ascending: false })
+      .limit(10);
+
+    captions = result.data as Caption[] | null;
+    fetchError = !!result.error;
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-stone-950">
@@ -19,6 +45,13 @@ export default async function Assignment2() {
 
       {/* Subtle grain overlay */}
       <div className="absolute inset-0 opacity-[0.03] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI2EpIi8+PC9zdmc+')]" />
+
+      {/* Navbar */}
+      {user && (
+        <div className="relative z-10">
+          <Navbar user={user} />
+        </div>
+      )}
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center gap-8 px-6 py-16">
@@ -32,13 +65,28 @@ export default async function Assignment2() {
           <div className="mt-2 h-px w-24 bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
         </div>
 
-        {error && (
+        {params.error && (
+          <p className="text-red-400/80 text-sm">
+            Authentication failed. Please try again.
+          </p>
+        )}
+
+        {!user && (
+          <div className="flex flex-col items-center gap-6 mt-12">
+            <p className="text-white/50 text-lg font-light">
+              Sign in with Google to view the top captions.
+            </p>
+            <AuthButton user={user} />
+          </div>
+        )}
+
+        {user && fetchError && (
           <p className="text-red-400/80 text-sm">
             Failed to load captions. Please try again later.
           </p>
         )}
 
-        {captions && captions.length > 0 && (
+        {user && captions && captions.length > 0 && (
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
             {captions.map((caption, index) => (
               <div
@@ -54,7 +102,7 @@ export default async function Assignment2() {
                 {caption.images && (
                   <div className="relative mb-4 overflow-hidden rounded-xl h-48">
                     <Image
-                      src={(caption.images as unknown as { id: string; url: string }).url}
+                      src={caption.images.url}
                       alt="Caption image"
                       fill
                       unoptimized
@@ -84,7 +132,7 @@ export default async function Assignment2() {
           </div>
         )}
 
-        {captions && captions.length === 0 && (
+        {user && captions && captions.length === 0 && (
           <p className="text-white/40 text-sm mt-8">No captions found.</p>
         )}
       </div>
