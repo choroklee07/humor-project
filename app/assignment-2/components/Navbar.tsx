@@ -13,7 +13,7 @@ export default function Navbar({ user }: { user: User | null }) {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.refresh();
+    router.push('/assignment-2');
   };
 
   return (

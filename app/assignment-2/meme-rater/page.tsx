@@ -2,6 +2,15 @@ import { createClient } from '@/lib/supabase/server';
 import Navbar from '../components/Navbar';
 import MemeRaterClient from './MemeRaterClient';
 
+function shuffleAndPick<T>(arr: T[], n: number): T[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, n);
+}
+
 export default async function MemeRater() {
   const supabase = await createClient();
   const {
@@ -18,17 +27,30 @@ export default async function MemeRater() {
   let captions: Caption[] | null = null;
 
   if (user) {
-    const { data } = await supabase
+    // Get caption IDs the user has already voted on
+    const { data: votedData } = await supabase
+      .from('caption_votes')
+      .select('caption_id')
+      .eq('profile_id', user.id);
+
+    const votedIds = votedData?.map((v: { caption_id: string }) => v.caption_id) ?? [];
+
+    // Fetch unvoted captions (larger pool so we have enough after URL validation)
+    let query = supabase
       .from('captions')
       .select('id, content, like_count, images!inner(id, url)')
       .not('images.url', 'is', null)
       .like('images.url', 'http%')
-      .order('like_count', { ascending: false })
-      .limit(100);
+      .limit(150);
+
+    if (votedIds.length > 0) {
+      query = query.not('id', 'in', `(${votedIds.join(',')})`);
+    }
+
+    const { data } = await query;
 
     if (data) {
-      // Normalize inner join result (images comes as object, not array)
-      const rows = (data as unknown as Caption[]);
+      const rows = data as unknown as Caption[];
 
       // Check which image URLs actually work (HEAD request, parallel)
       const checks = await Promise.all(
@@ -41,7 +63,10 @@ export default async function MemeRater() {
           }
         })
       );
-      captions = checks.filter((c): c is Caption => c !== null).slice(0, 50);
+
+      const valid = checks.filter((c): c is Caption => c !== null);
+
+      captions = shuffleAndPick(valid, 30);
     }
   }
 

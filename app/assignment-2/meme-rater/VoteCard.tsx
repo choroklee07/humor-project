@@ -9,7 +9,7 @@ type Caption = {
 
 export default function VoteCard({ caption }: { caption: Caption }) {
   return (
-    <div className="group relative w-full rounded-2xl border-2 border-pink-400 bg-pink-500/20 backdrop-blur-sm p-4 sm:p-5 transition-all">
+    <div className="group relative w-full rounded-2xl border-2 border-pink-400 bg-pink-500/20 backdrop-blur-sm p-4 sm:p-4 transition-all">
       {/* Subtle top edge glow */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-pink-400/20 to-transparent rounded-t-2xl" />
 
@@ -33,7 +33,7 @@ export default function VoteCard({ caption }: { caption: Caption }) {
       )}
 
       {/* Caption text */}
-      <p className="relative mt-4 text-lg sm:text-xl text-white/70 font-light leading-relaxed text-center">
+      <p className="relative text-lg sm:text-2xl text-white  leading-relaxed text-left">
         {caption.content}
       </p>
     </div>

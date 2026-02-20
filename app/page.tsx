@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -18,7 +18,7 @@ export default function Home() {
             href="/assignment-2"
             className="flex h-14 w-56 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-500/10 text-sm font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20"
           >
-            Assignment 2+3
+            Assignment 2-4
           </Link>
         </div>
       </main>

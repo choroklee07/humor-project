@@ -54,7 +54,7 @@ export default async function Assignment2({
       )}
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center gap-8 px-6 pt-24 pb-16">
+      <div className="relative z-10 flex flex-col items-center gap-8 px-6 pt-8 pb-16">
         <div className="flex flex-col items-center gap-4">
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-extralight tracking-tight text-white/90">
             Top Captions
@@ -84,7 +84,7 @@ export default async function Assignment2({
         )}
 
         {user && captions && captions.length > 0 && (
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
+          <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
             {captions.map((caption, index) => (
               <div
                 key={caption.id}
@@ -97,19 +97,19 @@ export default async function Assignment2({
 
                 {/* Image */}
                 {caption.images && (
-                  <div className="relative mb-4 overflow-hidden rounded-xl h-48">
+                  <div className="relative mb-8 overflow-hidden rounded-xl h-70">
                     <Image
                       src={caption.images.url}
                       alt="Caption image"
                       fill
                       unoptimized
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-contain transition-transform duration-500"
                     />
                   </div>
                 )}
 
                 {/* Caption text */}
-                <p className="text-white/80 font-light leading-relaxed">
+                <p className="text-white/80 font-light leading-relaxed text-xl">
                   {caption.content}
                 </p>
 
