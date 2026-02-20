@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import MemeRaterClient from './MemeRaterClient';
 
@@ -16,6 +17,10 @@ export default async function MemeRater() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/assignment-2');
+  }
 
   type Caption = {
     id: string;
