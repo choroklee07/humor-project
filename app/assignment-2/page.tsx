@@ -1,7 +1,7 @@
-import Image from "next/image";
-import { createClient } from "@/lib/supabase/server";
-import Navbar from "@/components/Navbar";
-import AuthButton from "./components/AuthButton";
+import Image from 'next/image';
+import { createClient } from '@/lib/supabase/server';
+import Navbar from './components/Navbar';
+import AuthButton from './components/AuthButton';
 
 export default async function Assignment2({
   searchParams,
@@ -27,9 +27,9 @@ export default async function Assignment2({
 
   if (user) {
     const result = await supabase
-      .from("captions")
-      .select("id, content, like_count, images(id, url)")
-      .order("like_count", { ascending: false })
+      .from('captions')
+      .select('id, content, like_count, images(id, url)')
+      .order('like_count', { ascending: false })
       .limit(10);
 
     captions = result.data as Caption[] | null;
@@ -54,11 +54,8 @@ export default async function Assignment2({
       )}
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center gap-8 px-6 py-16">
+      <div className="relative z-10 flex flex-col items-center gap-8 px-6 pt-24 pb-16">
         <div className="flex flex-col items-center gap-4">
-          <p className="text-emerald-400/60 text-sm tracking-[0.3em] uppercase font-light">
-            Assignment 02
-          </p>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-extralight tracking-tight text-white/90">
             Top Captions
           </h1>
