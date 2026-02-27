@@ -38,7 +38,8 @@ export default async function MemeRater() {
       .select('caption_id')
       .eq('profile_id', user.id);
 
-    const votedIds = votedData?.map((v: { caption_id: string }) => v.caption_id) ?? [];
+    const votedIds =
+      votedData?.map((v: { caption_id: string }) => v.caption_id) ?? [];
 
     // Fetch unvoted captions (larger pool so we have enough after URL validation)
     let query = supabase
@@ -61,12 +62,15 @@ export default async function MemeRater() {
       const checks = await Promise.all(
         rows.map(async (caption) => {
           try {
-            const res = await fetch(caption.images!.url, { method: 'HEAD', signal: AbortSignal.timeout(3000) });
+            const res = await fetch(caption.images!.url, {
+              method: 'HEAD',
+              signal: AbortSignal.timeout(3000),
+            });
             return res.ok ? caption : null;
           } catch {
             return null;
           }
-        })
+        }),
       );
 
       const valid = checks.filter((c): c is Caption => c !== null);

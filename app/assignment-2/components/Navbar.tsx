@@ -10,6 +10,7 @@ export default function Navbar({ user }: { user: User | null }) {
   const router = useRouter();
   const pathname = usePathname();
   const isMemeRater = pathname.startsWith('/assignment-2/meme-rater');
+  const isMemeCompiler = pathname.startsWith('/assignment-2/meme-compiler');
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -18,15 +19,36 @@ export default function Navbar({ user }: { user: User | null }) {
 
   return (
     <nav className="w-full border-b border-white/5 bg-white/[0.02] backdrop-blur-md">
-      <div className="mx-auto flex max-w-5xl items-center justify-end px-6 py-3">
+      <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
+        <Link
+          href="/assignment-2"
+          className="text-white/50 transition-colors hover:text-emerald-400"
+          aria-label="Home"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" />
+            <path d="M9 21V12h6v9" />
+          </svg>
+        </Link>
+
         {user && (
           <div className="flex items-center gap-4">
-            <Link
-              href={isMemeRater ? '/assignment-2' : '/assignment-2/meme-rater'}
-              className="text-white/70 text-sm underline transition-colors hover:text-emerald-400"
-            >
-              {isMemeRater ? 'Assignment 2' : 'Meme Rater'}
-            </Link>
+            {!isMemeRater && (
+              <Link
+                href="/assignment-2/meme-rater"
+                className="text-white/70 text-sm underline transition-colors hover:text-emerald-400"
+              >
+                Meme Rater
+              </Link>
+            )}
+            {!isMemeCompiler && (
+              <Link
+                href="/assignment-2/meme-compiler"
+                className="text-white/70 text-sm underline transition-colors hover:text-emerald-400"
+              >
+                Meme Compiler
+              </Link>
+            )}
             <span className="text-white/70 text-sm">{user.email}</span>
             <button
               onClick={handleSignOut}
