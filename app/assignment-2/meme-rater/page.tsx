@@ -45,6 +45,7 @@ export default async function MemeRater() {
     let query = supabase
       .from('captions')
       .select('id, content, like_count, images!inner(id, url)')
+      .eq('humor_flavor_id', 557)
       .not('images.url', 'is', null)
       .like('images.url', 'http%')
       .limit(150);

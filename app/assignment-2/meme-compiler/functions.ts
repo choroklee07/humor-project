@@ -163,7 +163,7 @@ async function generateCaptions(
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ imageId }),
+        body: JSON.stringify({ imageId, humorFlavorId: 557 }),
       }
     );
 
